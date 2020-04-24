@@ -9,6 +9,7 @@ OBJDIRNAME = gamefiles
 
 #compiler and flags
 CPP = g++
+CFLAGS = -g
 LDFLAGS = -lX11 -lGL -lpthread -lpng -lstdc++fs
 RM = rm -rf
 
@@ -42,7 +43,7 @@ $(NAME): $(OBJFILES)
 
 $(BUILDDIR)/$(NAME)/$(OBJDIRNAME)/%.o: $(TOPDIR)/%.cpp
 	@mkdir -p $(dir $@)
-	@$(CPP) -c -o $@ $< $(LDFLAGS)
+	@$(CPP) $(CFLAGS) -c -o $@ $< $(LDFLAGS)
 
 clean:
 	@$(RM) $(CLEANTARGET) $(FASTLINKNAME)

@@ -1,0 +1,34 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "buildGame",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "NAME=${input:Game}"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label":"cleanAllGames",
+            "type":"shell",
+            "command":"make clean"
+        }
+    ],
+    "inputs": [
+        {
+            "type": "command",
+            "id": "Game",
+            "command":"shellCommand.execute",
+            "args":{
+                "command":"ls",
+                "cwd":"${workspaceFolder}/games"
+            }
+        }
+    ]
+}
