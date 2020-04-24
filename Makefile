@@ -1,0 +1,48 @@
+#locations
+TOPDIR = .
+GAMESDIR = $(TOPDIR)/games
+OLCDIR = $(TOPDIR)/external/olc
+BUILDDIR = $(TOPDIR)/build
+
+#names for relative locations
+OBJDIRNAME = gamefiles
+
+#compiler and flags
+CPP = g++
+LDFLAGS = -lX11 -lGL -lpthread -lpng -lstdc++fs
+RM = rm -rf
+
+#output environment
+EXT = .x
+FASTLINKNAME = play$(EXT)
+
+#default goal manipulation
+MAKECMDGOALS = all
+CLEANTARGET = $(BUILDDIR)/$(NAME)
+
+#specific game build
+#INPUT: 
+#NAME: name of the game folder
+CPPFILES :=
+
+sinclude $(GAMESDIR)/$(NAME)/$(NAME).mk
+#OUTPUT:
+#CPPFILES: Add single game files here
+#CPPFDIRS: TODO: parse this folders for additional source files
+
+OBJFILES := $(patsubst $(TOPDIR)%,$(BUILDDIR)/$(NAME)/$(OBJDIRNAME)%,$(CPPFILES:.cpp=.o))
+
+$(info $(OBJFILES))
+all: $(NAME)
+
+$(NAME): $(OBJFILES)
+	@$(CPP) -o $(BUILDDIR)/$@/$@$(EXT) $< $(LDFLAGS)
+	@rm -f $(FASTLINKNAME) 2> /dev/null
+	@ln -s $(BUILDDIR)/$@/$@$(EXT) $(FASTLINKNAME)
+
+$(BUILDDIR)/$(NAME)/$(OBJDIRNAME)/%.o: $(TOPDIR)/%.cpp
+	@mkdir -p $(dir $@)
+	@$(CPP) -c -o $@ $< $(LDFLAGS)
+
+clean:
+	@$(RM) $(CLEANTARGET) $(FASTLINKNAME)

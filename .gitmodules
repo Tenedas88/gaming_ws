@@ -1,0 +1,3 @@
+[submodule "external/olc"]
+	path = external/olc
+	url = https://github.com/OneLoneCoder/olcPixelGameEngine.git
