@@ -2,6 +2,7 @@
 TOPDIR = .
 GAMESDIR = $(TOPDIR)/games
 OLCDIR = $(TOPDIR)/external/olc
+OLCDIR += $(TOPDIR)/external/olc/Extensions
 BUILDDIR = $(TOPDIR)/build
 
 #names for relative locations
@@ -27,7 +28,7 @@ CLEANTARGET = $(BUILDDIR)/$(NAME)
 CPPFILES :=
 CPPDIRS :=
 USERINCDIR  :=
-INCDIR += -I$(OLCDIR)
+INCDIR += $(foreach olc_inc, $(OLCDIR), -I$(olc_inc))
 
 sinclude $(GAMESDIR)/$(NAME)/$(NAME).mk
 #OUTPUT:
