@@ -25,25 +25,32 @@ CLEANTARGET = $(BUILDDIR)/$(NAME)
 #INPUT: 
 #NAME: name of the game folder
 CPPFILES :=
+CPPDIRS :=
+USERINCDIR  :=
+INCDIR += -I$(OLCDIR)
 
 sinclude $(GAMESDIR)/$(NAME)/$(NAME).mk
 #OUTPUT:
 #CPPFILES: Add single game files here
-#CPPFDIRS: TODO: parse this folders for additional source files
+#CPPDIRS: entire folders containing source files
+#USERINCDIR: entier folders containing header files
 
+CPPFILES += $(sort $(foreach src_dir, $(CPPDIRS), $(shell find $(src_dir) -name "*.cpp")))
+INCDIR += $(foreach inc_dir, $(USERINCDIR), $(foreach usr_dir, $(shell find $(inc_dir) -name "*.h"),-I$(dir $usr_dir)))
 OBJFILES := $(patsubst $(TOPDIR)%,$(BUILDDIR)/$(NAME)/$(OBJDIRNAME)%,$(CPPFILES:.cpp=.o))
 
 $(info $(OBJFILES))
 all: $(NAME)
 
 $(NAME): $(OBJFILES)
+	@mkdir -p $(BUILDDIR)/$(NAME)
 	@$(CPP) -o $(BUILDDIR)/$@/$@$(EXT) $< $(LDFLAGS)
 	@rm -f $(FASTLINKNAME) 2> /dev/null
 	@ln -s $(BUILDDIR)/$@/$@$(EXT) $(FASTLINKNAME)
 
 $(BUILDDIR)/$(NAME)/$(OBJDIRNAME)/%.o: $(TOPDIR)/%.cpp
 	@mkdir -p $(dir $@)
-	@$(CPP) $(CFLAGS) -c -o $@ $< $(LDFLAGS)
+	@$(CPP) $(CFLAGS) -c -o $@ $< $(LDFLAGS) $(INCDIR)
 
 clean:
 	@$(RM) $(CLEANTARGET) $(FASTLINKNAME)
