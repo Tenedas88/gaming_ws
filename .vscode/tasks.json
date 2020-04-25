@@ -18,6 +18,15 @@
             "label":"cleanAllGames",
             "type":"shell",
             "command":"make clean"
+        },
+        {
+            "label": "newGame",
+            "type": "shell",
+            "command":"${workspaceFolder}/tools/create_new_game/create_new_game.sh",
+            "args":[
+                "${input:newGameName}",
+                "${workspaceFolder}"
+            ]
         }
     ],
     "inputs": [
@@ -29,6 +38,11 @@
                 "command":"ls",
                 "cwd":"${workspaceFolder}/games"
             }
+        },
+        {
+            "type":"promptString",
+            "id":"newGameName",
+            "description": "The name of your new Game!"
         }
     ]
 }
