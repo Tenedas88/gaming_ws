@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/build/${input:Game}/${input:Game}.x",
             "args": ["${input:Game}"],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/build/${input:Game}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

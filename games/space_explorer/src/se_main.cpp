@@ -6,7 +6,7 @@ olc::vi2d JumpAnimation[20];
 class MyExampleThing
 {
 	public:
-		MyExampleThing():position(128,120)
+		MyExampleThing():position(128,120),sprite("./gamesprites/sprite.png")
 		{
 			color = olc::RED;
 			stopped = false;
@@ -93,11 +93,12 @@ class MyExampleThing
 				}
 			}
 
-			gameEngineIstance->DrawCircle(this->position,10,this->color);
+			gameEngineIstance->DrawSprite(this->position,&(this->sprite));
 		}
 
 	private:
 		olc::Pixel color;
+		olc::Sprite sprite;
 		olc::vi2d  position;
 		unsigned int jumpingStage;
 		bool       isJumping;
@@ -118,6 +119,7 @@ public:
 public:
     int frameCounter;
 	MyExampleThing* ExampleThing = NULL;
+	olc::Sprite* sprite;
 
 	bool OnUserCreate() override
 	{

@@ -7,6 +7,7 @@ BUILDDIR = $(TOPDIR)/build
 
 #names for relative locations
 OBJDIRNAME = gamefiles
+SPRITEDIRNAME = gamesprites
 
 #compiler and flags
 CPP = g++
@@ -34,7 +35,7 @@ sinclude $(GAMESDIR)/$(NAME)/$(NAME).mk
 #OUTPUT:
 #CPPFILES: Add single game files here
 #CPPDIRS: entire folders containing source files
-#USERINCDIR: entier folders containing header files
+#USERINCDIR: entire folders containing header files
 
 CPPFILES += $(sort $(foreach src_dir, $(CPPDIRS), $(shell find $(src_dir) -name "*.cpp")))
 INCDIR += $(foreach inc_dir, $(USERINCDIR), $(foreach usr_dir, $(shell find $(inc_dir) -name "*.h"),-I$(dir $usr_dir)))
@@ -45,6 +46,7 @@ all: $(NAME)
 
 $(NAME): $(OBJFILES)
 	@mkdir -p $(BUILDDIR)/$(NAME)
+	@cp -r $(GAMESDIR)/$(NAME)/$(SPRITEDIRNAME) $(BUILDDIR)/$(NAME)/ 2> /dev/null
 	@$(CPP) -o $(BUILDDIR)/$@/$@$(EXT) $< $(LDFLAGS)
 	@rm -f $(FASTLINKNAME) 2> /dev/null
 	@ln -s $(BUILDDIR)/$@/$@$(EXT) $(FASTLINKNAME)
