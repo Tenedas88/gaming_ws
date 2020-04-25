@@ -1,4 +1,17 @@
 VsCode suggested extensions:
 
->Tasks Shell Input
->Task Runner
+-Tasks Shell Input,
+-Task Runner
+
+To create a New Game:
+
+FROM BASH:
+-below "tools/create_new_game" run "create_game.sh"
+-$1: new game name
+-$2: repository root location (optiona, needed if not launched from other folders)
+
+FROM VSCODE:
+
+-run the "newGame" task
+
+in both cases the new game folder will be below master/games/yournewgame
