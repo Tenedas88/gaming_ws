@@ -6,7 +6,7 @@ olc::vi2d JumpAnimation[20];
 class MyExampleThing
 {
 	public:
-		MyExampleThing():position(128,120),sprite("./gamesprites/sprite2.png")
+		MyExampleThing():position(128,120),sprite("./gamesprites/sprite.png")
 		{
 			color = olc::RED;
 			stopped = false;
