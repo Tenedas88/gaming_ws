@@ -6,7 +6,14 @@ olc::vi2d JumpAnimation[20];
 class MyExampleThing
 {
 	public:
-		MyExampleThing():position(128,120),sprite("./gamesprites/sprite.png")
+		MyExampleThing():position(128,120),sprite("./gamesprites/sprite2.png")
+		{
+			color = olc::RED;
+			stopped = false;
+			isJumping = false;	
+			jumpingStage = 0;	
+		}
+		MyExampleThing(const char* spriteName):position((rand()%8)*32,(rand()%8)*30),sprite(spriteName)
 		{
 			color = olc::RED;
 			stopped = false;
@@ -96,6 +103,15 @@ class MyExampleThing
 			gameEngineIstance->DrawSprite(this->position,&(this->sprite));
 		}
 
+	void checkCollision(MyExampleThing* source)
+	{
+		if((abs(this->position.x - source->GetPosition().x) < 5) && (abs(this->position.y - source->GetPosition().y) < 5))
+		{
+			this->position.x = rand()%256;
+			this->position.y = rand()%240;
+		}
+	}
+
 	private:
 		olc::Pixel color;
 		olc::Sprite sprite;
@@ -119,12 +135,17 @@ public:
 public:
     int frameCounter;
 	MyExampleThing* ExampleThing = NULL;
+	MyExampleThing* targets[20] = {NULL};
 	olc::Sprite* sprite;
 
 	bool OnUserCreate() override
 	{
 		// Called once at the start, so create things here
 		ExampleThing = new MyExampleThing();
+		for(int i = 0; i < 20; i++)
+		{
+			targets[i] = new MyExampleThing("./gamesprites/sprite3.png");
+		}
 		return true;
 	}
 
@@ -186,6 +207,11 @@ public:
 					(this->frameCounter++%512 > 256) ? ExampleThing->changeColor(olc::BLUE):ExampleThing->changeColor(olc::RED);
 				}
 				ExampleThing->updateObject((olc::PixelGameEngine*)this);
+				for(int i=0;i<20;i++)
+				{
+					targets[i]->checkCollision(ExampleThing);
+					targets[i]->updateObject((olc::PixelGameEngine*)this);
+				}
 		return true;
 	}
 };
