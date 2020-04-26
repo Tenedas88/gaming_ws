@@ -8,14 +8,14 @@ uint8_t targetLayer = 0;
 class MyExampleThing
 {
 	public:
-		MyExampleThing():position(128,120),sprite("./gamesprites/sprite.png"),decal(&(this->sprite))
+		MyExampleThing():position(128,120),sprite("./gamesprites/police.png"),decal(&(this->sprite))
 		{
 			color = olc::RED;
 			stopped = false;
 			isJumping = false;	
 			jumpingStage = 0;	
 			layer = 0;
-			scale = {1.0f,1.0f};
+			scale = {0.2f,0.2f};
 		}
 		MyExampleThing(const char* spriteName,uint8_t inLayer):position((rand()%8)*32,(rand()%8)*30),sprite(spriteName),decal(&(this->sprite))
 		{
