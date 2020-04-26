@@ -31,18 +31,18 @@ CPPFILES :=
 CPPDIRS := $(MODULESDIR)
 USERINCDIR  :=
 INCDIR += $(foreach olc_inc, $(OLCDIR), -I$(olc_inc))
+INCDIR += $(foreach modules_dir, $(shell find $(MODULESDIR) -name "*.h"),-I$(dir $(modules_dir)))
 
-sinclude $(GAMESDIR)/$(NAME)/$(NAME).mk
+sinclude $(GAMESDIR)/$(NAME)/$(NAME)_module.mk
 #OUTPUT:
 #CPPFILES: Add single game files here
 #CPPDIRS: entire folders containing source files
 #USERINCDIR: entire folders containing header files
 
 CPPFILES += $(sort $(foreach src_dir, $(CPPDIRS), $(shell find $(src_dir) -name "*.cpp")))
-INCDIR += $(foreach inc_dir, $(USERINCDIR), $(foreach usr_dir, $(shell find $(inc_dir) -name "*.h"),-I$(dir $usr_dir)))
+INCDIR += $(foreach inc_dir, $(USERINCDIR), $(foreach usr_dir, $(shell find $(inc_dir) -name "*.h"),-I$(dir $(usr_dir))))
 OBJFILES := $(patsubst $(TOPDIR)%,$(BUILDDIR)/$(NAME)/$(OBJDIRNAME)%,$(CPPFILES:.cpp=.o))
 
-$(info $(OBJFILES))
 all: $(NAME)
 
 $(NAME): $(OBJFILES)
@@ -51,10 +51,11 @@ $(NAME): $(OBJFILES)
 	@$(CPP) -o $(BUILDDIR)/$@/$@$(EXT) $^ $(LDFLAGS)
 	@rm -f $(FASTLINKNAME) 2> /dev/null
 	@ln -s $(BUILDDIR)/$@/$@$(EXT) $(FASTLINKNAME)
+	@ln -s $(BUILDDIR)/$@/$(SPRITEDIRNAME) $(SPRITEDIRNAME)
 
 $(BUILDDIR)/$(NAME)/$(OBJDIRNAME)/%.o: $(TOPDIR)/%.cpp
 	@mkdir -p $(dir $@)
 	@$(CPP) $(CFLAGS) -c -o $@ $< $(LDFLAGS) $(INCDIR)
 
 clean:
-	@$(RM) $(CLEANTARGET) $(FASTLINKNAME)
+	@$(RM) $(CLEANTARGET) $(FASTLINKNAME) $(SPRITEDIRNAME)
