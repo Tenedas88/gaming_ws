@@ -2,23 +2,29 @@
 #include "olcPixelGameEngine.h"
 
 olc::vi2d JumpAnimation[20];
+uint8_t backgroundLayer = 0;
+uint8_t targetLayer = 0;
 
 class MyExampleThing
 {
 	public:
-		MyExampleThing():position(128,120),sprite("./gamesprites/sprite.png")
+		MyExampleThing():position(128,120),sprite("./gamesprites/sprite.png"),decal(&(this->sprite))
 		{
 			color = olc::RED;
 			stopped = false;
 			isJumping = false;	
 			jumpingStage = 0;	
+			layer = 0;
+			scale = {1.0f,1.0f};
 		}
-		MyExampleThing(const char* spriteName):position((rand()%8)*32,(rand()%8)*30),sprite(spriteName)
+		MyExampleThing(const char* spriteName,uint8_t inLayer):position((rand()%8)*32,(rand()%8)*30),sprite(spriteName),decal(&(this->sprite))
 		{
 			color = olc::RED;
 			stopped = false;
 			isJumping = false;	
 			jumpingStage = 0;	
+			layer = inLayer;
+			scale = {0.7f,0.7f};
 		}
 
 		void moveHorizontal(int shift)
@@ -76,6 +82,7 @@ class MyExampleThing
 
 		void updateObject(olc::PixelGameEngine* gameEngineIstance)
 		{
+			
 			if(!this->isJumping)
 			{
 				
@@ -99,24 +106,30 @@ class MyExampleThing
 					this->isJumping = false;
 				}
 			}
-
-			gameEngineIstance->DrawSprite(this->position,&(this->sprite));
+			
+			gameEngineIstance->SetDrawTarget(this->layer);
+			gameEngineIstance->SetPixelMode(olc::Pixel::ALPHA);
+			gameEngineIstance->DrawDecal(this->position,&(this->decal),this->scale);
+			gameEngineIstance->SetPixelMode(olc::Pixel::NORMAL);
 		}
 
 	void checkCollision(MyExampleThing* source)
 	{
-		if((abs(this->position.x - source->GetPosition().x) < 5) && (abs(this->position.y - source->GetPosition().y) < 5))
+		if((abs(this->position.x - source->GetPosition().x) < 10) && (abs(this->position.y - source->GetPosition().y) < 10))
 		{
-			this->position.x = rand()%256;
-			this->position.y = rand()%240;
+			this->position.x = (rand()%8)*32;
+			this->position.y = (rand()%8)*30;
 		}
 	}
 
 	private:
 		olc::Pixel color;
 		olc::Sprite sprite;
+		olc::Decal decal;
 		olc::vi2d  position;
 		unsigned int jumpingStage;
+		uint8_t    layer;
+		olc::vf2d scale;
 		bool       isJumping;
 		bool 	   isRightJump;
 		bool       isLeftJump;
@@ -136,15 +149,32 @@ public:
     int frameCounter;
 	MyExampleThing* ExampleThing = NULL;
 	MyExampleThing* targets[20] = {NULL};
-	olc::Sprite* sprite;
+	olc::Sprite* sprite = NULL;
+	olc::Decal* decal = NULL;
 
 	bool OnUserCreate() override
 	{
+
+		sprite = new olc::Sprite("./gamesprites/spritemap.png");
+		decal = new olc::Decal(sprite);
 		// Called once at the start, so create things here
+		Clear(olc::BLANK);
+
+		targetLayer = CreateLayer();
+		EnableLayer(targetLayer,true);
+		SetDrawTarget(targetLayer);
+		Clear(olc::BLANK);
+
+		backgroundLayer = CreateLayer();
+		EnableLayer(backgroundLayer,true);
+		SetDrawTarget(backgroundLayer);
+		Clear(olc::BLANK);
+
+		SetDrawTarget((uint8_t)0);
 		ExampleThing = new MyExampleThing();
 		for(int i = 0; i < 20; i++)
 		{
-			targets[i] = new MyExampleThing("./gamesprites/sprite3.png");
+			targets[i] = new MyExampleThing("./gamesprites/sprite3.png",targetLayer);
 		}
 		return true;
 	}
@@ -152,10 +182,13 @@ public:
 	bool OnUserUpdate(float fElapsedTime) override
 	{
 		bool userInput = false;
+
+		SetDrawTarget(backgroundLayer);
+		DrawDecal({0,0},decal,{0.5f,0.5f});
 		// called once per frame
 		for (int x = 0; x < ScreenWidth(); x++)
 			for (int y = 0; y < ScreenHeight(); y++)
-				Draw(x, y, olc::Pixel(255,255,255));
+//				Draw(x, y, olc::BLANK));
 				if(GetKey(olc::A).bHeld)
 				{
 					ExampleThing->moveHorizontal(-2);
