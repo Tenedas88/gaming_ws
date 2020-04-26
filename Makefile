@@ -1,5 +1,6 @@
 #locations
 TOPDIR = .
+MODULESDIR = $(TOPDIR)/modules
 GAMESDIR = $(TOPDIR)/games
 OLCDIR = $(TOPDIR)/external/olc
 OLCDIR += $(TOPDIR)/external/olc/Extensions
@@ -26,8 +27,8 @@ CLEANTARGET = $(BUILDDIR)/$(NAME)
 #specific game build
 #INPUT: 
 #NAME: name of the game folder
-CPPFILES :=
-CPPDIRS :=
+CPPFILES := 
+CPPDIRS := $(MODULESDIR)
 USERINCDIR  :=
 INCDIR += $(foreach olc_inc, $(OLCDIR), -I$(olc_inc))
 
@@ -47,7 +48,7 @@ all: $(NAME)
 $(NAME): $(OBJFILES)
 	@mkdir -p $(BUILDDIR)/$(NAME)
 	@cp -r $(GAMESDIR)/$(NAME)/$(SPRITEDIRNAME) $(BUILDDIR)/$(NAME)/ 2> /dev/null
-	@$(CPP) -o $(BUILDDIR)/$@/$@$(EXT) $< $(LDFLAGS)
+	@$(CPP) -o $(BUILDDIR)/$@/$@$(EXT) $^ $(LDFLAGS)
 	@rm -f $(FASTLINKNAME) 2> /dev/null
 	@ln -s $(BUILDDIR)/$@/$@$(EXT) $(FASTLINKNAME)
 

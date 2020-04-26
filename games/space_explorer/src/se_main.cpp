@@ -1,4 +1,3 @@
-#define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 
 olc::vi2d JumpAnimation[20];
