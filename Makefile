@@ -49,7 +49,7 @@ $(NAME): $(OBJFILES)
 	@mkdir -p $(BUILDDIR)/$(NAME)
 	@cp -r $(GAMESDIR)/$(NAME)/$(SPRITEDIRNAME) $(BUILDDIR)/$(NAME)/ 2> /dev/null
 	@$(CPP) -o $(BUILDDIR)/$@/$@$(EXT) $^ $(LDFLAGS)
-	@rm -f $(FASTLINKNAME) 2> /dev/null
+	@rm -f $(FASTLINKNAME) $(SPRITEDIRNAME) 2> /dev/null
 	@ln -s $(BUILDDIR)/$@/$@$(EXT) $(FASTLINKNAME)
 	@ln -s $(BUILDDIR)/$@/$(SPRITEDIRNAME) $(SPRITEDIRNAME)
 
