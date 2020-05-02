@@ -27,6 +27,8 @@ class SolidObject
     public:
         SolidObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius);
 
+        //~SolidObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius){//TODO}
+
         //getter-setter for collision space
         void setCollisionSpace(CollisionSpaceHandle_t inputCollisionSpace){this->collisionSpace = inputCollisionSpace;}
         CollisionSpaceHandle_t getCollisionSpace(void){return this->collisionSpace;}
@@ -34,6 +36,9 @@ class SolidObject
         olc::vi2d getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination);
 
         olc::vi2d updatePosition(olc::vi2d& destination, void* Args);
+
+        olc::vi2d getPosition(void){return this->position;}
+        unsigned int getRadius(void){return this->radius;}
 
     private:
         
@@ -49,7 +54,7 @@ class SolidObject
 class SolidObjGameEngine
 {
     public:
-        SolidObjGameEngine()
+        SolidObjGameEngine():collisionMatrix()
         {
             allocatedCollisionSpaces = 0;
         }

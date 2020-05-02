@@ -37,22 +37,26 @@ void SolidObjGameEngine::registerSolidObject(CollisionSpaceHandle_t collisionSpa
     if(collisionSpace < this->allocatedCollisionSpaces)
     {
         this->collisionMatrix[collisionSpace]->collisionsArray[this->collisionMatrix[collisionSpace]->registeredCollisions++] = objectPtr;
+        objectPtr->setCollisionSpace(collisionSpace);
     }
 }
 
 CollisionSpaceHandle_t SolidObjGameEngine::createCollisionSpace(olc::vi2d* collisionSurface, uint32_t size)
 {
     CollisionSurface_t* toInsertCollisionSurface     = new CollisionSurface_t;
+
     toInsertCollisionSurface->collisionSurfaceSize   = size;
     toInsertCollisionSurface->registeredCollisions   = 0;
 
-    for(int i = 0; i < size; i++)
-    {
-        toInsertCollisionSurface[i].collisionSurfacePoints[i] = collisionSurface[i];
-    }
+    // for(int i = 0; i < size; i++)
+    // {
+    //     //toInsertCollisionSurface[i].collisionSurfacePoints = new CollisionSurfaceCorners_t;
+    //     toInsertCollisionSurface[i].collisionSurfacePoints[i] = collisionSurface[i];
+    // }
 
-    this->collisionMatrix[allocatedCollisionSpaces++] = toInsertCollisionSurface;
+    this->collisionMatrix[allocatedCollisionSpaces] = toInsertCollisionSurface;
 
+    this->allocatedCollisionSpaces++;
     return (this->allocatedCollisionSpaces-1);
 }
 
