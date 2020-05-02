@@ -19,6 +19,7 @@ olc::vi2d SolidObject::updatePosition(olc::vi2d& destination, void* Args)
     olc::vi2d resultDestination = this->objectMovementFunction(Args);
     resultDestination           = this->gameEngine->calculateSolidDestination(this,resultDestination);
 
+    this->position = resultDestination;
     return resultDestination;
 }
 
@@ -36,7 +37,8 @@ void SolidObjGameEngine::registerSolidObject(CollisionSpaceHandle_t collisionSpa
 {
     if(collisionSpace < this->allocatedCollisionSpaces)
     {
-        this->collisionMatrix[collisionSpace]->collisionsArray[this->collisionMatrix[collisionSpace]->registeredCollisions++] = objectPtr;
+        this->collisionMatrix[collisionSpace]->collisionsArray.push_back(objectPtr);
+        this->collisionMatrix[collisionSpace]->registeredCollisions++;
         objectPtr->setCollisionSpace(collisionSpace);
     }
 }
@@ -48,13 +50,12 @@ CollisionSpaceHandle_t SolidObjGameEngine::createCollisionSpace(olc::vi2d* colli
     toInsertCollisionSurface->collisionSurfaceSize   = size;
     toInsertCollisionSurface->registeredCollisions   = 0;
 
-    // for(int i = 0; i < size; i++)
-    // {
-    //     //toInsertCollisionSurface[i].collisionSurfacePoints = new CollisionSurfaceCorners_t;
-    //     toInsertCollisionSurface[i].collisionSurfacePoints[i] = collisionSurface[i];
-    // }
+    for(int i = 0; i < size; i++)
+    {
+        toInsertCollisionSurface[i].collisionSurfacePoints.push_back(collisionSurface[i]);
+    }
 
-    this->collisionMatrix[allocatedCollisionSpaces] = toInsertCollisionSurface;
+    this->collisionMatrix.push_back(toInsertCollisionSurface);
 
     this->allocatedCollisionSpaces++;
     return (this->allocatedCollisionSpaces-1);

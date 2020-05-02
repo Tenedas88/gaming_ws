@@ -15,9 +15,9 @@ class MySolidObject : public SolidObject
 	private:
 		virtual olc::vi2d objectMovementFunction(void* Args) override
 		{
-			MySolidObjectContext_t Ctx = (MySolidObjectContext_t*)Args;
+			MySolidObjectContext_t* Ctx = (MySolidObjectContext_t*)Args;
 			olc::vi2d destination = this->getPosition();
-			if(Ctx)
+			if(*Ctx)
 			{
 				destination.x += 1%240;
 			}
@@ -39,11 +39,11 @@ public:
 	CollisionSpaceHandle_t objSpace    = INVALID_COLLISION_HANDLE;
 	olc::vi2d 			   surface     = {0,0};//TODO: add support for surface shape calculation
 
-	Example():stoppedObjStart(120,150),movingObjStart(120,128),destination(120,240)
+	Example():stoppedObjStart(120,200),movingObjStart(120,128),destination(120,240)
 	{
-		SolidObjGameEngine* SolidEngine = new SolidObjGameEngine();
-		MySolidObject*      stoppedObj  = new MySolidObject(SolidEngine,stoppedObjStart,10);
-		MySolidObject*      movingObj   = new MySolidObject(SolidEngine,movingObjStart,10);
+		this->SolidEngine = new SolidObjGameEngine();
+		this->stoppedObj  = new MySolidObject(SolidEngine,stoppedObjStart,1);
+		this->movingObj   = new MySolidObject(SolidEngine,movingObjStart,1);
 
 		objSpace = SolidEngine->createCollisionSpace(&surface, 1);
 		SolidEngine->registerSolidObject(objSpace,stoppedObj);
@@ -60,11 +60,12 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
+		bool test = true;
 		// called once per frame
-		for (int x = 0; x < ScreenWidth(); x++)
-			for (int y = 0; y < ScreenHeight(); y++)
+		// for (int x = 0; x < ScreenWidth(); x++)
+		// 	for (int y = 0; y < ScreenHeight(); y++)
 				//Draw(x, y, olc::Pixel(rand() % 255, rand() % 255, rand()% 255));	
-				movingObj->updatePosition(destination,(void*)true);
+				movingObj->updatePosition(destination,(void*)&test);
 
 				DrawCircle(movingObj->getPosition(),movingObj->getRadius(),olc::RED);
 				DrawCircle(stoppedObj->getPosition(),stoppedObj->getRadius(),olc::RED);
