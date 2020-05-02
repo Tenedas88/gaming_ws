@@ -2,8 +2,10 @@
 
 static olc::vi2d calculate2Ddistance(olc::vi2d p1, olc::vi2d p2)
 {
-    int distance = sqrt(pow(p1.x-p2.x,2)+pow(p1.y-p2.y,2));
-    return {distance, distance}; 
+    olc::vi2d distance;
+    distance.x = abs(p1.x-p2.x);
+    distance.y = abs(p1.y-p2.y);
+    return distance; 
 }
 
 SolidObject::SolidObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius)
@@ -19,17 +21,28 @@ olc::vi2d SolidObject::updatePosition(olc::vi2d& destination, void* Args)
     olc::vi2d resultDestination = this->objectMovementFunction(Args);
     resultDestination           = this->gameEngine->calculateSolidDestination(this,resultDestination);
 
-    this->position = resultDestination;
-    return resultDestination;
+    this->position.x += resultDestination.x;
+    this->position.y += resultDestination.y;
+    return this->position;
 }
 
 olc::vi2d SolidObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
 {
-    olc::vi2d allowedDestination = calculate2Ddistance(this->position,targetDestination);
+    olc::vi2d allowedDestination   = calculate2Ddistance(this->position,targetDestination);
+    olc::vi2d targetObjectPosition = targetObject->getPosition(); 
+    olc::vi2d targetObjectDistance;
+    targetObjectDistance.x = targetDestination.x - targetObjectPosition.x;
+    targetObjectDistance.y = targetDestination.y - targetObjectPosition.y;
 
-    (targetObject->position.x < this->position.x) ? allowedDestination.x -= (this->radius+targetObject->radius) : allowedDestination.x += (this->radius+targetObject->radius);
-    (targetObject->position.y < this->position.y) ? allowedDestination.y -= (this->radius+targetObject->radius) : allowedDestination.y += (this->radius+targetObject->radius);
+    if(allowedDestination.x != 0)
+        (targetObject->position.x < this->position.x) ? allowedDestination.x -= (this->radius+targetObject->radius) : allowedDestination.x += (this->radius+targetObject->radius);
+    if(allowedDestination.y != 0)
+        (targetObject->position.y < this->position.y) ? allowedDestination.y -= (this->radius+targetObject->radius) : allowedDestination.y += (this->radius+targetObject->radius);
     
+
+    if((targetObjectDistance.x) < allowedDestination.x) allowedDestination.x = targetObjectDistance.x;
+    if((targetObjectDistance.y) < allowedDestination.y) allowedDestination.y = targetObjectDistance.y;
+
     return allowedDestination;
 }
 
