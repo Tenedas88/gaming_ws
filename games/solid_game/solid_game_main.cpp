@@ -3,11 +3,11 @@
 
 olc::vi2d 			   surface[3];//TODO: add support for surface shape calculation
 
-class MySolidObject : public SolidRoundObject
+class MySolidObject : public SolidSquareObject
 {
 	public:
 		MySolidObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius):
-			SolidRoundObject(solidEngine,onCreatePosition,onCreateRadius),
+			SolidSquareObject(solidEngine,onCreatePosition,onCreateRadius),
 			lastPosition(onCreatePosition)
 		{
 			reset = false;

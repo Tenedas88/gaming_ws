@@ -85,6 +85,22 @@ olc::vi2d SolidRoundObject::getAllowedDestination(SolidObject* targetObject, olc
 
 olc::vi2d SolidSquareObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
 {
+    CollisionSurfaceCorners_t squareCorners;
+    unsigned int length = this->getRadius();
+    squareCorners.push_back(this->getPosition()+olc::vi2d(-length,-length));
+    squareCorners.push_back(this->getPosition()+olc::vi2d(-length,length));
+    squareCorners.push_back(this->getPosition()+olc::vi2d(length,length));
+    squareCorners.push_back(this->getPosition()+olc::vi2d(length,-length));
+
+    //target object variable preparation
+    olc::vi2d targetObjectPosition = targetObject->getPosition(); 
+    olc::vi2d targetObjectDistance;
+    targetObjectDistance.x = targetDestination.x - targetObjectPosition.x;
+    targetObjectDistance.y = targetDestination.y - targetObjectPosition.y; 
+
+    if(!pnpolySurfaceBoundsCalculation(4,squareCorners,targetDestination))
+        return targetObjectDistance;
+
     return {10,10};
 }
 
