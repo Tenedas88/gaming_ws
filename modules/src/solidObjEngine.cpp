@@ -83,15 +83,8 @@ olc::vi2d SolidRoundObject::getAllowedDestination(SolidObject* targetObject, olc
 
 //******************************** SolidSquareObject ********************//
 
-olc::vi2d SolidSquareObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
+olc::vi2d SolidPolygonObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
 {
-    CollisionSurfaceCorners_t squareCorners;
-    unsigned int length = this->getRadius();
-    squareCorners.push_back(this->getPosition()+olc::vi2d(-length,-length));
-    squareCorners.push_back(this->getPosition()+olc::vi2d(-length,length));
-    squareCorners.push_back(this->getPosition()+olc::vi2d(length,length));
-    squareCorners.push_back(this->getPosition()+olc::vi2d(length,-length));
-
     //target object variable preparation
     olc::vi2d targetObjectPosition = targetObject->getPosition(); 
     olc::vi2d targetObjectDistance;
@@ -101,13 +94,13 @@ olc::vi2d SolidSquareObject::getAllowedDestination(SolidObject* targetObject, ol
     targetObjectDistance.x < 0? targetDirection.x = -targetObject->getRadius():targetObjectDistance.x==0 ? targetDirection.x = 0: targetDirection.x = targetObject->getRadius(); 
     targetObjectDistance.y < 0? targetDirection.y = -targetObject->getRadius():targetObjectDistance.y==0 ? targetDirection.y = 0: targetDirection.y = targetObject->getRadius(); 
 
-    if(!pnpolySurfaceBoundsCalculation(4,squareCorners,targetDestination+targetDirection))
+    if(!pnpolySurfaceBoundsCalculation(this->surfaceSize,this->surfacecorners,targetDestination+targetDirection))
         return targetObjectDistance;
 
-    if(!pnpolySurfaceBoundsCalculation(4,squareCorners,olc::vi2d(targetDestination.x+targetDirection.x,0)))
+    if(!pnpolySurfaceBoundsCalculation(this->surfaceSize,this->surfacecorners,olc::vi2d(targetDestination.x+targetDirection.x,0)))
         targetObjectDistance.x = 0;
 
-    if(!pnpolySurfaceBoundsCalculation(4,squareCorners,olc::vi2d(0,targetDestination.y+targetDirection.y)))
+    if(!pnpolySurfaceBoundsCalculation(this->surfaceSize,this->surfacecorners,olc::vi2d(0,targetDestination.y+targetDirection.y)))
         targetObjectDistance.y = 0;
 
     return targetObjectDistance;
@@ -146,6 +139,8 @@ CollisionSpaceHandle_t SolidObjGameEngine::createCollisionSpace(olc::vi2d* colli
 olc::vi2d SolidObjGameEngine::calculateSolidDestination(SolidObject* targetObject, olc::vi2d targetDestination)
 {
     if(targetObject->getCollisionSpace() == INVALID_COLLISION_HANDLE) return targetDestination;
+    olc::vi2d targetCalculatedDestination = {0,0};
+    olc::vi2d targetResultDestination     = targetDestination;
 
     CollisionSurface_t* targetSurface = this->collisionMatrix[targetObject->getCollisionSpace()];
     CollisionVector_t   collisionsArray = targetSurface->collisionsArray;
@@ -156,16 +151,22 @@ olc::vi2d SolidObjGameEngine::calculateSolidDestination(SolidObject* targetObjec
         {
             if(pnpolySurfaceBoundsCalculation(targetSurface->collisionSurfaceSize,targetSurface->collisionSurfacePoints,(*registeredObject)->getPosition()))
             {
-                targetDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination);
+                targetCalculatedDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination);
+
+                if (abs(targetCalculatedDestination.x) < abs(targetResultDestination.x))
+                    targetResultDestination.x = targetCalculatedDestination.x;
+
+                if (abs(targetCalculatedDestination.y) < abs(targetResultDestination.y))
+                    targetResultDestination.y = targetCalculatedDestination.y;
             }
             else
             {
                 //case current obstacle is not within the surface
-                targetDestination.x = targetDestination.x - targetObject->getPosition().x;
-                targetDestination.y = targetDestination.y - targetObject->getPosition().y;
+                targetResultDestination.x = targetDestination.x - targetObject->getPosition().x;
+                targetResultDestination.y = targetDestination.y - targetObject->getPosition().y;
             }
         }
     }
 
-    return targetDestination;
+    return targetResultDestination;
 }

@@ -60,14 +60,59 @@ class SolidRoundObject : public SolidObject
         virtual olc::vi2d getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination);
 };
 
+//Class for polygons objects
+class SolidPolygonObject : public SolidObject
+{
+    public:
+        SolidPolygonObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius,
+                            CollisionSurfaceCorners_t& corners):
+            SolidObject(solidEngine,onCreatePosition,onCreateRadius)
+            {
+                for(auto corner = corners.begin();corner <corners.end();corner++)
+                {
+                    this->surfacecorners.push_back(*corner);
+                    this->surfaceSize++;
+                }
+            }
+
+        virtual olc::vi2d getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination);
+
+    protected:
+        //constructor for hineritance
+        SolidPolygonObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius):
+            SolidObject(solidEngine,onCreatePosition,onCreateRadius){}
+
+        uint32_t                  surfaceSize;
+        CollisionSurfaceCorners_t surfacecorners;
+};
+
 //Class for square objects
-class SolidSquareObject : public SolidObject
+class SolidSquareObject : public SolidPolygonObject
 {
     public:
         SolidSquareObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius):
-            SolidObject(solidEngine,onCreatePosition,onCreateRadius){}
+            SolidPolygonObject(solidEngine,onCreatePosition,onCreateRadius)
+            {
+                this->surfaceSize = 4;
+                this->surfacecorners.push_back(onCreatePosition+olc::vi2d(-onCreateRadius,-onCreateRadius));
+                this->surfacecorners.push_back(onCreatePosition+olc::vi2d(onCreateRadius,-onCreateRadius));
+                this->surfacecorners.push_back(onCreatePosition+olc::vi2d(onCreateRadius,onCreateRadius));
+                this->surfacecorners.push_back(onCreatePosition+olc::vi2d(-onCreateRadius,onCreateRadius));
+            }
+};
 
-        virtual olc::vi2d getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination);
+//Class for square objects
+class SolidTriangleObject : public SolidPolygonObject
+{
+    public:
+        SolidTriangleObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius):
+            SolidPolygonObject(solidEngine,onCreatePosition,onCreateRadius)
+            {
+                this->surfaceSize = 3;
+                this->surfacecorners.push_back(onCreatePosition+olc::vi2d(0,-onCreateRadius));
+                this->surfacecorners.push_back(onCreatePosition+olc::vi2d((onCreateRadius/2)*2,onCreateRadius/3));
+                this->surfacecorners.push_back(onCreatePosition+olc::vi2d(-(onCreateRadius/2)*2,onCreateRadius/3));
+            }
 };
 
 //SolidObjGameEngine: contains the collision logic for SolidObject
