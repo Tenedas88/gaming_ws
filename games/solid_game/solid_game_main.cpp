@@ -113,12 +113,6 @@ public:
 		DrawCircle(destination,movingObj->getRadius()+1,olc::WHITE);
 		DrawCircle(movingObj->updatePosition(destination,(void*)&destination),movingObj->getRadius(),olc::RED);
 		DrawCircle(stoppedObj->getPosition(),stoppedObj->getRadius(),olc::WHITE);
-		
-		//old Example
-		//DrawCircle(stoppedObjStart,2,olc::RED);
-		//DrawCircle(movingObjStart,2,olc::WHITE);
-		//DrawCircle(movingObj->updatePosition(stoppedObjStart,(void*)&stoppedObjStart),movingObj->getRadius(),olc::RED);
-		//DrawCircle(stoppedObj->updatePosition(movingObjStart,(void*)&movingObjStart),stoppedObj->getRadius(),olc::WHITE);
 
 		return true;
 	}
