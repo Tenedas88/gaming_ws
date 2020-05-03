@@ -2,6 +2,7 @@
 #include "solidObjEngine.h"
 
 olc::vi2d 			      surface[3];//TODO: add support for surface shape calculation
+CollisionSurfaceCorners_t customShape;
 
 class MySolidObject : public SolidRoundObject
 {
@@ -57,37 +58,62 @@ class Example : public olc::PixelGameEngine
 {
 public:
 	SolidObjGameEngine*    SolidEngine = NULL;
+
+	//obstacles
 	olc::vi2d 			   stoppedObjStart;
 	olc::vi2d 			   stoppedObjLast;
-	SolidRoundObject*         stoppedObj  = NULL;
+	SolidRoundObject*      stoppedObj  = NULL;
+
 	olc::vi2d 			   stoppedTriangleObjStart;
-	SolidTriangleObject*         stoppedTriangleObj  = NULL;
+	SolidTriangleObject*   stoppedTriangleObj  = NULL;
+
 	olc::vi2d 			   stoppedSquareObjStart;
-	SolidSquareObject*         stoppedSquareObj  = NULL;
+	SolidSquareObject*     stoppedSquareObj  = NULL;
+
+	olc::vi2d 			   stoppedPolygonObjStart;
+	SolidPolygonObject*    stoppedPolygonObj = NULL;
+
+	olc::vi2d 			   stoppedLineObjStart;
+	olc::vi2d 			   stoppedLineObjDirection;
+	SolidLineObject*       stoppedLineObj = NULL;
+
+	//enemy
 	olc::vi2d			   movingObjStart;
 	olc::vi2d			   movingObjLast;
 	MySolidObject*         movingObj   = NULL;
 
+	//cursor
 	olc::vi2d 			   destination;
+
+	//collision space
 	CollisionSpaceHandle_t objSpace    = INVALID_COLLISION_HANDLE;
 
 	Example():
 		stoppedObjStart(123,128),
 		stoppedTriangleObjStart(115,180),
 		stoppedSquareObjStart(140,180),
+		stoppedPolygonObjStart(128,160),
+		stoppedLineObjStart(128,190),
+		stoppedLineObjDirection(1,-1),
 		movingObjStart(128,118),
 		destination(120,240)
 	{
 		this->SolidEngine 		  = new SolidObjGameEngine();
+
 		this->stoppedObj  		  = new SolidRoundObject   (SolidEngine,stoppedObjStart,6);
 		this->stoppedTriangleObj  = new SolidTriangleObject(SolidEngine,stoppedTriangleObjStart,6);
 		this->stoppedSquareObj    = new SolidSquareObject  (SolidEngine,stoppedSquareObjStart,6);
+		this->stoppedPolygonObj   = new SolidPolygonObject (SolidEngine,stoppedPolygonObjStart,6,customShape);
+		this->stoppedLineObj      = new SolidLineObject    (SolidEngine,stoppedLineObjStart,stoppedLineObjDirection,6);
+
 		this->movingObj   		  = new MySolidObject      (SolidEngine,movingObjStart,3);
 
 		objSpace = SolidEngine->createCollisionSpace(surface, 3);
 		SolidEngine->registerSolidObject(objSpace,stoppedObj);
 		SolidEngine->registerSolidObject(objSpace,stoppedTriangleObj);
 		SolidEngine->registerSolidObject(objSpace,stoppedSquareObj);
+		SolidEngine->registerSolidObject(objSpace,stoppedPolygonObj);
+		SolidEngine->registerSolidObject(objSpace,stoppedLineObj);
 		SolidEngine->registerSolidObject(objSpace,movingObj);
 		sAppName = "Example";
 	}
@@ -137,6 +163,13 @@ public:
 					 stoppedTriangleObjStart+olc::vi2d(-(6/2)*2,6/3),
 					 olc::WHITE);
 
+		for(int i = 0; i < 5; i++)
+		{
+			DrawLine(customShape[i]+stoppedPolygonObjStart,customShape[(i+1)%5]+stoppedPolygonObjStart,olc::WHITE);
+		}
+
+		DrawLine(stoppedLineObjStart+(stoppedLineObjDirection*(6/2)),stoppedLineObjStart-(stoppedLineObjDirection*(6/2)),olc::WHITE);
+
 		//draw cursor
 		DrawCircle(destination,movingObj->getRadius()+1,olc::CYAN);
 
@@ -153,6 +186,12 @@ int main()
 	surface[0] = {128,100};
 	surface[1] = {148,200};
 	surface[2] = {108,200};
+
+	customShape.push_back(olc::vi2d(-5,-5));
+	customShape.push_back(olc::vi2d(-5,5));
+	customShape.push_back(olc::vi2d(5,5));
+	customShape.push_back(olc::vi2d(7,7));
+	customShape.push_back(olc::vi2d(-6,-5));
 
 	Example demo;
 	if (demo.Construct(256, 240, 4, 4))

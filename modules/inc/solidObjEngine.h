@@ -70,7 +70,7 @@ class SolidPolygonObject : public SolidObject
             {
                 for(auto corner = corners.begin();corner <corners.end();corner++)
                 {
-                    this->surfacecorners.push_back(*corner);
+                    this->surfacecorners.push_back((*corner)+onCreatePosition);
                     this->surfaceSize++;
                 }
             }
@@ -84,6 +84,21 @@ class SolidPolygonObject : public SolidObject
 
         uint32_t                  surfaceSize;
         CollisionSurfaceCorners_t surfacecorners;
+};
+
+//class for round objects
+class SolidLineObject : public SolidPolygonObject
+{
+    public:
+        SolidLineObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,olc::vi2d& onCreateDirection,unsigned int onCreateRadius):
+            SolidPolygonObject(solidEngine,onCreatePosition,onCreateRadius)
+            {
+                this->surfaceSize = 2;
+                this->surfacecorners.push_back(onCreatePosition+(onCreateDirection*(onCreateRadius/2)));
+                this->surfacecorners.push_back(onCreatePosition-(onCreateDirection*(onCreateRadius/2)));
+            }
+
+        virtual olc::vi2d getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination) override;
 };
 
 //Class for square objects

@@ -81,7 +81,7 @@ olc::vi2d SolidRoundObject::getAllowedDestination(SolidObject* targetObject, olc
     return allowedDestination;
 }
 
-//******************************** SolidSquareObject ********************//
+//******************************** SolidPolygonObject ********************//
 
 olc::vi2d SolidPolygonObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
 {
@@ -106,6 +106,34 @@ olc::vi2d SolidPolygonObject::getAllowedDestination(SolidObject* targetObject, o
     return targetObjectDistance;
 }
 
+//******************************** SolidPolygonObject ********************//
+
+olc::vi2d SolidLineObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
+{
+    //target object variable preparation
+    olc::vi2d targetObjectPosition = targetObject->getPosition(); 
+    olc::vi2d targetObjectDistance;
+    targetObjectDistance.x = targetDestination.x - targetObjectPosition.x;
+    targetObjectDistance.y = targetDestination.y - targetObjectPosition.y;
+    olc::vi2d targetDirection;
+    targetObjectDistance.x < 0? targetDirection.x = -targetObject->getRadius():targetObjectDistance.x==0 ? targetDirection.x = 0: targetDirection.x = targetObject->getRadius(); 
+    targetObjectDistance.y < 0? targetDirection.y = -targetObject->getRadius():targetObjectDistance.y==0 ? targetDirection.y = 0: targetDirection.y = targetObject->getRadius(); 
+
+    //TODO:update allowed direction calculation for line
+    if(!pnpolySurfaceBoundsCalculation(this->surfaceSize,this->surfacecorners,targetDestination+targetDirection))
+        return targetObjectDistance;
+
+    if(!pnpolySurfaceBoundsCalculation(this->surfaceSize,this->surfacecorners,olc::vi2d(targetDestination.x+targetDirection.x,0)))
+        targetObjectDistance.x = 0;
+
+    if(!pnpolySurfaceBoundsCalculation(this->surfaceSize,this->surfacecorners,olc::vi2d(0,targetDestination.y+targetDirection.y)))
+        targetObjectDistance.y = 0;
+
+    return targetObjectDistance;
+}
+
+//******************************** SolidObjGameEngine *******************//
+
 void SolidObjGameEngine::registerSolidObject(CollisionSpaceHandle_t collisionSpace,SolidObject* objectPtr)
 {
     if(collisionSpace < this->allocatedCollisionSpaces)
@@ -115,8 +143,6 @@ void SolidObjGameEngine::registerSolidObject(CollisionSpaceHandle_t collisionSpa
         objectPtr->setCollisionSpace(collisionSpace);
     }
 }
-
-//******************************** SolidObjGameEngine *******************//
 
 CollisionSpaceHandle_t SolidObjGameEngine::createCollisionSpace(olc::vi2d* collisionSurface, uint32_t size)
 {
