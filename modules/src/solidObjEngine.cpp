@@ -9,6 +9,18 @@ static olc::vi2d calculate2Ddistance(olc::vi2d p1, olc::vi2d p2)
     return distance; 
 }
 
+static bool pnpolySurfaceBoundsCalculation(int size, CollisionSurfaceCorners_t& surface, olc::vi2d point)
+{ 
+  bool intersect = false;
+  int j  = 0;
+  for (int i = 0, j = size-1; i < size; j = i++) {
+    if ( ((surface[i].y>point.y) != (surface[j].y>point.y)) &&
+     (point.x < (surface[j].x-surface[i].x) * (point.y-surface[i].y) / (surface[j].y-surface[i].y) + surface[i].x) )
+       intersect = !intersect;
+  }
+  return intersect;
+}
+
 SolidObject::SolidObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius)
 {
     this->position       = onCreatePosition;
@@ -28,16 +40,16 @@ olc::vi2d SolidObject::updatePosition(olc::vi2d& destination, void* Args)
 }
 
 olc::vi2d SolidObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
-{
-    olc::vi2d objsDistance         = calculate2Ddistance(this->position,targetDestination);
-    if(std::sqrt(std::pow(objsDistance.x,2)+std::pow(objsDistance.y,2)) > (this->getRadius()+targetObject->getRadius()))
-        return targetObjectDistance;
-
+{   
     //target object variable preparation
     olc::vi2d targetObjectPosition = targetObject->getPosition(); 
     olc::vi2d targetObjectDistance;
     targetObjectDistance.x = targetDestination.x - targetObjectPosition.x;
     targetObjectDistance.y = targetDestination.y - targetObjectPosition.y;
+
+    olc::vi2d objsDistance         = calculate2Ddistance(this->position,targetDestination);
+    if(std::sqrt(std::pow(objsDistance.x,2)+std::pow(objsDistance.y,2)) > (this->getRadius()+targetObject->getRadius()))
+        return targetObjectDistance;
 
     //distance calculation variable preparation
     olc::vi2d allowedDestination   = objsDistance;
@@ -84,7 +96,7 @@ CollisionSpaceHandle_t SolidObjGameEngine::createCollisionSpace(olc::vi2d* colli
 
     for(int i = 0; i < size; i++)
     {
-        toInsertCollisionSurface[i].collisionSurfacePoints.push_back(collisionSurface[i]);
+        toInsertCollisionSurface->collisionSurfacePoints.push_back(collisionSurface[i]);
     }
 
     this->collisionMatrix.push_back(toInsertCollisionSurface);
@@ -100,12 +112,21 @@ olc::vi2d SolidObjGameEngine::calculateSolidDestination(SolidObject* targetObjec
     CollisionSurface_t* targetSurface = this->collisionMatrix[targetObject->getCollisionSpace()];
     CollisionVector_t   collisionsArray = targetSurface->collisionsArray;
 
-    for(auto registeredObject = collisionsArray.begin(); registeredObject != collisionsArray.end(); registeredObject++)
+    if(pnpolySurfaceBoundsCalculation(targetSurface->collisionSurfaceSize,targetSurface->collisionSurfacePoints,targetObject->getPosition()))
     {
-        if((*registeredObject) != targetObject)
+        for(auto registeredObject = collisionsArray.begin(); registeredObject != collisionsArray.end(); registeredObject++)
         {
-            targetDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination);
+            if((*registeredObject) != targetObject)
+            {
+                targetDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination);
+            }
         }
+    }
+    else
+    {
+        targetDestination.x = targetDestination.x - targetObject->getPosition().x;
+        targetDestination.y = targetDestination.y - targetObject->getPosition().y;
+        return targetDestination;
     }
 
     return targetDestination;

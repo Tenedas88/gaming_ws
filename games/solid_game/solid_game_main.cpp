@@ -1,6 +1,8 @@
 #include "olcPixelGameEngine.h"
 #include "solidObjEngine.h"
 
+olc::vi2d 			   surface[3];//TODO: add support for surface shape calculation
+
 class MySolidObject : public SolidObject
 {
 	public:
@@ -64,15 +66,14 @@ public:
 
 	olc::vi2d 			   destination;
 	CollisionSpaceHandle_t objSpace    = INVALID_COLLISION_HANDLE;
-	olc::vi2d 			   surface     = {0,0};//TODO: add support for surface shape calculation
 
-	Example():stoppedObjStart(120,128),movingObjStart(120,118),destination(120,240)
+	Example():stoppedObjStart(120,128),movingObjStart(128,118),destination(120,240)
 	{
 		this->SolidEngine = new SolidObjGameEngine();
 		this->stoppedObj  = new MySolidObject(SolidEngine,stoppedObjStart,6);
 		this->movingObj   = new MySolidObject(SolidEngine,movingObjStart,3);
 
-		objSpace = SolidEngine->createCollisionSpace(&surface, 1);
+		objSpace = SolidEngine->createCollisionSpace(surface, 3);
 		SolidEngine->registerSolidObject(objSpace,stoppedObj);
 		SolidEngine->registerSolidObject(objSpace,movingObj);
 		sAppName = "Example";
@@ -109,6 +110,11 @@ public:
 		{
 			destination.y+=2;
 		}
+
+		for(int i = 0; i < 3; i++)
+		{
+			DrawLine(surface[i],surface[(i+1)%3],olc::GREEN);
+		}
 		
 		DrawCircle(destination,movingObj->getRadius()+1,olc::WHITE);
 		DrawCircle(movingObj->updatePosition(destination,(void*)&destination),movingObj->getRadius(),olc::RED);
@@ -121,6 +127,9 @@ public:
 
 int main()
 {
+	surface[0] = {128,100};
+	surface[1] = {148,200};
+	surface[2] = {108,200};
 	Example demo;
 	if (demo.Construct(256, 240, 4, 4))
 		demo.Start();
