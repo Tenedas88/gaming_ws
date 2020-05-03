@@ -29,30 +29,36 @@ olc::vi2d SolidObject::updatePosition(olc::vi2d& destination, void* Args)
 
 olc::vi2d SolidObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
 {
-    olc::vi2d allowedDestination   = calculate2Ddistance(this->position,targetDestination);
-    unsigned int slope = (allowedDestination.x == 0) ? allowedDestination.y:allowedDestination.y/allowedDestination.x;
-    float yCorrection  = 0;
-    float xCorrection  = 0;
-
-    if(allowedDestination.x != 0)
-    {
-        xCorrection = std::cos(atan(slope))*(this->radius)+std::cos(atan(slope))*(targetObject->radius);
-        allowedDestination.x -= std::round(xCorrection);
-    }
-    if(allowedDestination.y != 0)
-    {
-        yCorrection = std::sin(atan(slope))*(this->radius)+std::sin(atan(slope))*(targetObject->radius);
-        
-        allowedDestination.y -= std::round(yCorrection);
-    }
-
     olc::vi2d targetObjectPosition = targetObject->getPosition(); 
     olc::vi2d targetObjectDistance;
     targetObjectDistance.x = targetDestination.x - targetObjectPosition.x;
     targetObjectDistance.y = targetDestination.y - targetObjectPosition.y;
 
-    if(abs(targetObjectDistance.x) <= allowedDestination.x) allowedDestination.x = targetObjectDistance.x;
-    if(abs(targetObjectDistance.y) <= allowedDestination.y) allowedDestination.y = targetObjectDistance.y;
+    olc::vi2d allowedDestination   = calculate2Ddistance(this->position,targetDestination);
+    if(std::sqrt(std::pow(allowedDestination.x,2)+std::pow(allowedDestination.y,2)) > (this->getRadius()+targetObject->getRadius()))
+        return targetObjectDistance;
+
+    unsigned int slope = (allowedDestination.x == 0) ? allowedDestination.y:allowedDestination.y/allowedDestination.x;
+    float yCorrection  = 0;
+    float xCorrection  = 0;
+
+    //TODO: check allowed position signes transformations
+    if(allowedDestination.x != 0)
+    {
+        xCorrection = std::cos(atan(slope))*(this->radius)+std::cos(atan(slope))*(targetObject->radius);
+        (xCorrection <= allowedDestination.x) ? allowedDestination.x -= std::round(xCorrection): allowedDestination.x = 0;
+    }
+    if(allowedDestination.y != 0)
+    {
+        yCorrection = std::sin(atan(slope))*(this->radius)+std::sin(atan(slope))*(targetObject->radius);
+        (yCorrection <= allowedDestination.y) ? allowedDestination.y -= std::round(yCorrection): allowedDestination.y = 0;
+        
+    }
+
+    if((abs(targetDestination.x) - abs(this->position.x)) > (this->getRadius()+targetObject->getRadius())) allowedDestination.x = targetObjectDistance.x;
+    if((abs(targetDestination.y) - abs(this->position.y)) > (this->getRadius()+targetObject->getRadius())) allowedDestination.y = targetObjectDistance.y;
+    //(abs(targetObjectDistance.x) <= allowedDestination.x) ? allowedDestination.x = targetObjectDistance.x : allowedDestination.x *= (targetDestination.x/targetDestination.x);
+    //(abs(targetObjectDistance.y) <= allowedDestination.y) ? allowedDestination.y = targetObjectDistance.y : allowedDestination.y *= (targetDestination.y/targetDestination.y);
 
     return allowedDestination;
 }

@@ -18,9 +18,12 @@ class MySolidObject : public SolidObject
 			if(Args != NULL)
 			{
 				olc::vi2d* inputDestination = (olc::vi2d*)Args;
-				if(abs(inputDestination->y-lastPosition.y) < this->getRadius() && reset)
+				if((abs(inputDestination->y-lastPosition.y) < this->getRadius())
+				   && (abs(inputDestination->x-lastPosition.x) < this->getRadius()) 
+				   && reset)
 				{
 					destination.y = 175+rand()%25;
+					destination.x = 128;
 					reset = false;
 				}
 				else
@@ -29,7 +32,13 @@ class MySolidObject : public SolidObject
 					{
 						((inputDestination->y - destination.y) < 0) ? destination.y--:destination.y++;
 						destination.y = destination.y%240;
-						lastPosition = destination;
+						lastPosition.y = destination.y;
+					}
+					if((inputDestination->x - destination.x) != 0)
+					{
+						((inputDestination->x - destination.x) < 0) ? destination.x--:destination.x++;
+						//destination.x = destination.x%256;
+						lastPosition.x = destination.x;
 					}
 					reset = true;
 				}
@@ -57,10 +66,10 @@ public:
 	CollisionSpaceHandle_t objSpace    = INVALID_COLLISION_HANDLE;
 	olc::vi2d 			   surface     = {0,0};//TODO: add support for surface shape calculation
 
-	Example():stoppedObjStart(120,200),movingObjStart(120,128),destination(120,240)
+	Example():stoppedObjStart(120,128),movingObjStart(120,118),destination(120,240)
 	{
 		this->SolidEngine = new SolidObjGameEngine();
-		this->stoppedObj  = new MySolidObject(SolidEngine,stoppedObjStart,4);
+		this->stoppedObj  = new MySolidObject(SolidEngine,stoppedObjStart,6);
 		this->movingObj   = new MySolidObject(SolidEngine,movingObjStart,3);
 
 		objSpace = SolidEngine->createCollisionSpace(&surface, 1);
@@ -78,15 +87,38 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
+
 		// called once per frame
 		for (int x = 0; x < ScreenWidth(); x++)
 		 	for (int y = 0; y < ScreenHeight(); y++)
 				Draw(x, y, olc::BLANK);	
 
-		DrawCircle(stoppedObjStart,2,olc::RED);
-		DrawCircle(movingObjStart,2,olc::WHITE);
-		DrawCircle(movingObj->updatePosition(stoppedObjStart,(void*)&stoppedObjStart),movingObj->getRadius(),olc::RED);
-		DrawCircle(stoppedObj->updatePosition(movingObjStart,(void*)&movingObjStart),stoppedObj->getRadius(),olc::WHITE);
+		if(GetKey(olc::A).bHeld)
+		{
+			destination.x-=2;
+		}
+		if(GetKey(olc::D).bHeld)
+		{
+			destination.x+=2;
+		}
+		if(GetKey(olc::W).bHeld)
+		{
+			destination.y-=2;
+		}
+		if(GetKey(olc::S).bHeld)
+		{
+			destination.y+=2;
+		}
+		
+		DrawCircle(destination,movingObj->getRadius()+1,olc::WHITE);
+		DrawCircle(movingObj->updatePosition(destination,(void*)&destination),movingObj->getRadius(),olc::RED);
+		DrawCircle(stoppedObj->getPosition(),stoppedObj->getRadius(),olc::WHITE);
+		
+		//old Example
+		//DrawCircle(stoppedObjStart,2,olc::RED);
+		//DrawCircle(movingObjStart,2,olc::WHITE);
+		//DrawCircle(movingObj->updatePosition(stoppedObjStart,(void*)&stoppedObjStart),movingObj->getRadius(),olc::RED);
+		//DrawCircle(stoppedObj->updatePosition(movingObjStart,(void*)&movingObjStart),stoppedObj->getRadius(),olc::WHITE);
 
 		return true;
 	}
