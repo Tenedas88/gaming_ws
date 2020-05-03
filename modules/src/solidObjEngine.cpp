@@ -1,6 +1,7 @@
 #include "solidObjEngine.h"
 #include <cmath>
 
+//******************************** local static functions ***************//
 static olc::vi2d calculate2Ddistance(olc::vi2d p1, olc::vi2d p2)
 {
     olc::vi2d distance;
@@ -21,6 +22,8 @@ static bool pnpolySurfaceBoundsCalculation(int size, CollisionSurfaceCorners_t& 
   return intersect;
 }
 
+//******************************** SolidObject Base Class ***************//
+
 SolidObject::SolidObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius)
 {
     this->position       = onCreatePosition;
@@ -39,7 +42,8 @@ olc::vi2d SolidObject::updatePosition(olc::vi2d& destination, void* Args)
     return this->position;
 }
 
-olc::vi2d SolidObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
+//******************************** SolidRoundObject *********************//
+olc::vi2d SolidRoundObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
 {   
     //target object variable preparation
     olc::vi2d targetObjectPosition = targetObject->getPosition(); 
@@ -59,12 +63,12 @@ olc::vi2d SolidObject::getAllowedDestination(SolidObject* targetObject, olc::vi2
 
     if(allowedDestination.x != 0)
     {
-        xCorrection = std::cos(atan(slope))*(this->radius)+std::cos(atan(slope))*(targetObject->radius);
+        xCorrection = std::cos(atan(slope))*(this->getRadius())+std::cos(atan(slope))*(targetObject->getRadius());
         (xCorrection <= allowedDestination.x) ? allowedDestination.x -= std::round(xCorrection): allowedDestination.x = 0;
     }
     if(allowedDestination.y != 0)
     {
-        yCorrection = std::sin(atan(slope))*(this->radius)+std::sin(atan(slope))*(targetObject->radius);
+        yCorrection = std::sin(atan(slope))*(this->getRadius())+std::sin(atan(slope))*(targetObject->getRadius());
         (yCorrection <= allowedDestination.y) ? allowedDestination.y -= std::round(yCorrection): allowedDestination.y = 0;
         
     }
@@ -77,6 +81,13 @@ olc::vi2d SolidObject::getAllowedDestination(SolidObject* targetObject, olc::vi2
     return allowedDestination;
 }
 
+//******************************** SolidSquareObject ********************//
+
+olc::vi2d SolidSquareObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
+{
+    return {10,10};
+}
+
 void SolidObjGameEngine::registerSolidObject(CollisionSpaceHandle_t collisionSpace,SolidObject* objectPtr)
 {
     if(collisionSpace < this->allocatedCollisionSpaces)
@@ -86,6 +97,8 @@ void SolidObjGameEngine::registerSolidObject(CollisionSpaceHandle_t collisionSpa
         objectPtr->setCollisionSpace(collisionSpace);
     }
 }
+
+//******************************** SolidObjGameEngine *******************//
 
 CollisionSpaceHandle_t SolidObjGameEngine::createCollisionSpace(olc::vi2d* collisionSurface, uint32_t size)
 {

@@ -3,11 +3,11 @@
 
 olc::vi2d 			   surface[3];//TODO: add support for surface shape calculation
 
-class MySolidObject : public SolidObject
+class MySolidObject : public SolidRoundObject
 {
 	public:
 		MySolidObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius):
-			SolidObject(solidEngine,onCreatePosition,onCreateRadius),
+			SolidRoundObject(solidEngine,onCreatePosition,onCreateRadius),
 			lastPosition(onCreatePosition)
 		{
 			reset = false;
@@ -67,7 +67,7 @@ public:
 	olc::vi2d 			   destination;
 	CollisionSpaceHandle_t objSpace    = INVALID_COLLISION_HANDLE;
 
-	Example():stoppedObjStart(113,128),movingObjStart(128,118),destination(120,240)
+	Example():stoppedObjStart(123,128),movingObjStart(128,118),destination(120,240)
 	{
 		this->SolidEngine = new SolidObjGameEngine();
 		this->stoppedObj  = new MySolidObject(SolidEngine,stoppedObjStart,6);

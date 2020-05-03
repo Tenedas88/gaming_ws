@@ -22,7 +22,7 @@ typedef struct _CollisionSurface_t
 } CollisionSurface_t;
 
 //SolidObject is the base object of the SolidObjGameEngine
-class SolidObject 
+class SolidObject
 {
     public:
         SolidObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius);
@@ -32,22 +32,42 @@ class SolidObject
         //getter-setter for collision space
         void setCollisionSpace(CollisionSpaceHandle_t inputCollisionSpace){this->collisionSpace = inputCollisionSpace;}
         CollisionSpaceHandle_t getCollisionSpace(void){return this->collisionSpace;}
-
-        olc::vi2d getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination);
-
+        
         olc::vi2d updatePosition(olc::vi2d& destination, void* Args);
 
         olc::vi2d getPosition(void){return this->position;}
         unsigned int getRadius(void){return this->radius;}
 
-    private:
+        virtual olc::vi2d getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)=0;
         
-        virtual olc::vi2d objectMovementFunction(void* Args){(void)Args;return this->position;}
+    protected:
+        
+        virtual olc::vi2d objectMovementFunction(void* Args){(void)Args;return this->position;};
         
         olc::vi2d              position;
         unsigned int           radius;
         SolidObjGameEngine*    gameEngine;
         CollisionSpaceHandle_t collisionSpace;
+};
+
+//class for round objects
+class SolidRoundObject : public SolidObject
+{
+    public:
+        SolidRoundObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius):
+            SolidObject(solidEngine,onCreatePosition,onCreateRadius){}
+
+        virtual olc::vi2d getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination);
+};
+
+//Class for square objects
+class SolidSquareObject : public SolidObject
+{
+    public:
+        SolidSquareObject(SolidObjGameEngine* solidEngine,olc::vi2d& onCreatePosition,unsigned int onCreateRadius):
+            SolidObject(solidEngine,onCreatePosition,onCreateRadius){}
+
+        virtual olc::vi2d getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination);
 };
 
 //SolidObjGameEngine: contains the collision logic for SolidObject
