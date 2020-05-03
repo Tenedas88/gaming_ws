@@ -25,9 +25,12 @@ class MySolidObject : public SolidObject
 				}
 				else
 				{
-					(inputDestination->y < destination.y) ? destination.y-=1:destination.y +=1;
-					destination.y = destination.y%240;
-					lastPosition = destination;
+					if((inputDestination->y - destination.y) != 0)
+					{
+						((inputDestination->y - destination.y) < 0) ? destination.y--:destination.y++;
+						destination.y = destination.y%240;
+						lastPosition = destination;
+					}
 					reset = true;
 				}
 			}
@@ -82,8 +85,8 @@ public:
 
 		DrawCircle(stoppedObjStart,2,olc::RED);
 		DrawCircle(movingObjStart,2,olc::WHITE);
-		DrawCircle(stoppedObj->updatePosition(movingObjStart,(void*)&movingObjStart),stoppedObj->getRadius(),olc::WHITE);
 		DrawCircle(movingObj->updatePosition(stoppedObjStart,(void*)&stoppedObjStart),movingObj->getRadius(),olc::RED);
+		DrawCircle(stoppedObj->updatePosition(movingObjStart,(void*)&movingObjStart),stoppedObj->getRadius(),olc::WHITE);
 
 		return true;
 	}

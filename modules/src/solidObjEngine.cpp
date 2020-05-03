@@ -1,4 +1,5 @@
 #include "solidObjEngine.h"
+#include <cmath>
 
 static olc::vi2d calculate2Ddistance(olc::vi2d p1, olc::vi2d p2)
 {
@@ -29,19 +30,25 @@ olc::vi2d SolidObject::updatePosition(olc::vi2d& destination, void* Args)
 olc::vi2d SolidObject::getAllowedDestination(SolidObject* targetObject, olc::vi2d targetDestination)
 {
     olc::vi2d allowedDestination   = calculate2Ddistance(this->position,targetDestination);
+    unsigned int slope = (allowedDestination.x == 0) ? allowedDestination.y:allowedDestination.y/allowedDestination.x;
+    float yCorrection  = 0;
+
+    if(allowedDestination.x != 0)
+        allowedDestination.x -= std::cos(atan(slope))*(this->radius)+std::cos(atan(slope))*(targetObject->radius);
+    if(allowedDestination.y != 0)
+    {
+        yCorrection = std::sin(atan(slope))*(this->radius)+std::sin(atan(slope))*(targetObject->radius);
+        
+        allowedDestination.y -= std::round(yCorrection);
+    }
+
     olc::vi2d targetObjectPosition = targetObject->getPosition(); 
     olc::vi2d targetObjectDistance;
     targetObjectDistance.x = targetDestination.x - targetObjectPosition.x;
     targetObjectDistance.y = targetDestination.y - targetObjectPosition.y;
 
-    if(allowedDestination.x != 0)
-        (targetObject->position.x < this->position.x) ? allowedDestination.x -= (this->radius+targetObject->radius) : allowedDestination.x += (this->radius+targetObject->radius);
-    if(allowedDestination.y != 0)
-        (targetObject->position.y < this->position.y) ? allowedDestination.y -= (this->radius+targetObject->radius) : allowedDestination.y += (this->radius+targetObject->radius);
-    
-
-    if((targetObjectDistance.x) < allowedDestination.x) allowedDestination.x = targetObjectDistance.x;
-    if((targetObjectDistance.y) < allowedDestination.y) allowedDestination.y = targetObjectDistance.y;
+    if(abs(targetObjectDistance.x) <= allowedDestination.x) allowedDestination.x = targetObjectDistance.x;
+    if(abs(targetObjectDistance.y) <= allowedDestination.y) allowedDestination.y = targetObjectDistance.y;
 
     return allowedDestination;
 }
