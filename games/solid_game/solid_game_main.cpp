@@ -116,6 +116,7 @@ public:
 			DrawLine(surface[i],surface[(i+1)%3],olc::GREEN);
 		}
 		
+		DrawRect(stoppedObjStart-olc::vi2d(6,6),olc::vi2d(12,12),olc::WHITE);
 		DrawCircle(destination,movingObj->getRadius()+1,olc::WHITE);
 		DrawCircle(movingObj->updatePosition(destination,(void*)&destination),movingObj->getRadius(),olc::RED);
 		DrawCircle(stoppedObj->getPosition(),stoppedObj->getRadius(),olc::WHITE);

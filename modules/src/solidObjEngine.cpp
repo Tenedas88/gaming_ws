@@ -96,12 +96,21 @@ olc::vi2d SolidSquareObject::getAllowedDestination(SolidObject* targetObject, ol
     olc::vi2d targetObjectPosition = targetObject->getPosition(); 
     olc::vi2d targetObjectDistance;
     targetObjectDistance.x = targetDestination.x - targetObjectPosition.x;
-    targetObjectDistance.y = targetDestination.y - targetObjectPosition.y; 
+    targetObjectDistance.y = targetDestination.y - targetObjectPosition.y;
+    olc::vi2d targetDirection;
+    targetObjectDistance.x < 0? targetDirection.x = -targetObject->getRadius():targetObjectDistance.x==0 ? targetDirection.x = 0: targetDirection.x = targetObject->getRadius(); 
+    targetObjectDistance.y < 0? targetDirection.y = -targetObject->getRadius():targetObjectDistance.y==0 ? targetDirection.y = 0: targetDirection.y = targetObject->getRadius(); 
 
-    if(!pnpolySurfaceBoundsCalculation(4,squareCorners,targetDestination))
+    if(!pnpolySurfaceBoundsCalculation(4,squareCorners,targetDestination+targetDirection))
         return targetObjectDistance;
 
-    return {10,10};
+    if(!pnpolySurfaceBoundsCalculation(4,squareCorners,olc::vi2d(targetDestination.x+targetDirection.x,0)))
+        targetObjectDistance.x = 0;
+
+    if(!pnpolySurfaceBoundsCalculation(4,squareCorners,olc::vi2d(0,targetDestination.y+targetDirection.y)))
+        targetObjectDistance.y = 0;
+
+    return targetObjectDistance;
 }
 
 void SolidObjGameEngine::registerSolidObject(CollisionSpaceHandle_t collisionSpace,SolidObject* objectPtr)
