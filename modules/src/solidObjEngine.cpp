@@ -32,9 +32,13 @@ olc::vi2d SolidObject::getAllowedDestination(SolidObject* targetObject, olc::vi2
     olc::vi2d allowedDestination   = calculate2Ddistance(this->position,targetDestination);
     unsigned int slope = (allowedDestination.x == 0) ? allowedDestination.y:allowedDestination.y/allowedDestination.x;
     float yCorrection  = 0;
+    float xCorrection  = 0;
 
     if(allowedDestination.x != 0)
-        allowedDestination.x -= std::cos(atan(slope))*(this->radius)+std::cos(atan(slope))*(targetObject->radius);
+    {
+        xCorrection = std::cos(atan(slope))*(this->radius)+std::cos(atan(slope))*(targetObject->radius);
+        allowedDestination.x -= std::round(xCorrection);
+    }
     if(allowedDestination.y != 0)
     {
         yCorrection = std::sin(atan(slope))*(this->radius)+std::sin(atan(slope))*(targetObject->radius);
