@@ -67,7 +67,7 @@ public:
 	olc::vi2d 			   destination;
 	CollisionSpaceHandle_t objSpace    = INVALID_COLLISION_HANDLE;
 
-	Example():stoppedObjStart(120,128),movingObjStart(128,118),destination(120,240)
+	Example():stoppedObjStart(113,128),movingObjStart(128,118),destination(120,240)
 	{
 		this->SolidEngine = new SolidObjGameEngine();
 		this->stoppedObj  = new MySolidObject(SolidEngine,stoppedObjStart,6);

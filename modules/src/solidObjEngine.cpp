@@ -112,21 +112,21 @@ olc::vi2d SolidObjGameEngine::calculateSolidDestination(SolidObject* targetObjec
     CollisionSurface_t* targetSurface = this->collisionMatrix[targetObject->getCollisionSpace()];
     CollisionVector_t   collisionsArray = targetSurface->collisionsArray;
 
-    if(pnpolySurfaceBoundsCalculation(targetSurface->collisionSurfaceSize,targetSurface->collisionSurfacePoints,targetObject->getPosition()))
+    for(auto registeredObject = collisionsArray.begin(); registeredObject != collisionsArray.end(); registeredObject++)
     {
-        for(auto registeredObject = collisionsArray.begin(); registeredObject != collisionsArray.end(); registeredObject++)
+        if((*registeredObject) != targetObject)
         {
-            if((*registeredObject) != targetObject)
+            if(pnpolySurfaceBoundsCalculation(targetSurface->collisionSurfaceSize,targetSurface->collisionSurfacePoints,(*registeredObject)->getPosition()))
             {
                 targetDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination);
             }
+            else
+            {
+                //case current obstacle is not within the surface
+                targetDestination.x = targetDestination.x - targetObject->getPosition().x;
+                targetDestination.y = targetDestination.y - targetObject->getPosition().y;
+            }
         }
-    }
-    else
-    {
-        targetDestination.x = targetDestination.x - targetObject->getPosition().x;
-        targetDestination.y = targetDestination.y - targetObject->getPosition().y;
-        return targetDestination;
     }
 
     return targetDestination;
