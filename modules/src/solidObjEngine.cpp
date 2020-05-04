@@ -119,14 +119,45 @@ olc::vi2d SolidLineObject::getAllowedDestination(SolidObject* targetObject, olc:
     targetObjectDistance.x < 0? targetDirection.x = -targetObject->getRadius():targetObjectDistance.x==0 ? targetDirection.x = 0: targetDirection.x = targetObject->getRadius(); 
     targetObjectDistance.y < 0? targetDirection.y = -targetObject->getRadius():targetObjectDistance.y==0 ? targetDirection.y = 0: targetDirection.y = targetObject->getRadius(); 
 
-    //TODO:update allowed direction calculation for line
-    if(!pnpolySurfaceBoundsCalculation(this->surfaceSize,this->surfacecorners,targetDestination+targetDirection))
+    olc::vi2d centerToTargetDistanceVector = calculate2Ddistance(this->getPosition(),targetObject->getPosition());
+    unsigned int centerToTargetDistance = std::sqrt(std::pow(centerToTargetDistanceVector.x,2)+std::pow(centerToTargetDistanceVector.y,2));
+
+    unsigned int centerOnLineOffset = std::sqrt(std::pow(centerToTargetDistance,2)-std::pow(targetObject->getRadius(),2));
+
+    int xAxisDistance   = this->surfacecorners[0].x - this->surfacecorners[1].x;
+    int Slope = (xAxisDistance == 0) ? Slope = (this->surfacecorners[0].y-this->surfacecorners[1].y):Slope = ((this->surfacecorners[0].y-this->surfacecorners[1].y)/xAxisDistance);
+
+    olc::vi2d intersection;
+    if(Slope != 0)
+    {
+        intersection.x = Slope;
+        intersection.y = Slope;
+    }
+    else
+    {
+        intersection.x = Slope;
+        intersection.y = 0;
+    }
+
+    olc::vi2d intersectionPointOnLine = this->getPosition()+(intersection*centerOnLineOffset);
+
+    olc::vi2d intersectionToCenterDistance = calculate2Ddistance(intersectionPointOnLine,targetDestination);
+    unsigned int intersectionToCenterDistanceModule = 
+        std::sqrt(std::pow(intersectionToCenterDistance.x,2)+std::pow(intersectionToCenterDistance.y,2));
+
+    if(intersectionToCenterDistanceModule > targetObject->getRadius())
         return targetObjectDistance;
 
-    if(!pnpolySurfaceBoundsCalculation(this->surfaceSize,this->surfacecorners,olc::vi2d(targetDestination.x+targetDirection.x,0)))
+    olc::vi2d xIntersectionToCenterDistance = calculate2Ddistance(intersectionPointOnLine,olc::vi2d(targetDestination.x+targetDirection.x,0));
+    unsigned int xIntersectionToCenterDistanceModule = 
+        std::sqrt(std::pow(xIntersectionToCenterDistance.x,2)+std::pow(xIntersectionToCenterDistance.y,2));
+    if(xIntersectionToCenterDistanceModule > targetObject->getRadius())
         targetObjectDistance.x = 0;
 
-    if(!pnpolySurfaceBoundsCalculation(this->surfaceSize,this->surfacecorners,olc::vi2d(0,targetDestination.y+targetDirection.y)))
+    olc::vi2d yIntersectionToCenterDistance = calculate2Ddistance(intersectionPointOnLine,olc::vi2d(0,targetDestination.y+targetDirection.y));
+    unsigned int yIntersectionToCenterDistanceModule = 
+        std::sqrt(std::pow(yIntersectionToCenterDistance.x,2)+std::pow(yIntersectionToCenterDistance.y,2));
+    if(yIntersectionToCenterDistanceModule > targetObject->getRadius())
         targetObjectDistance.y = 0;
 
     return targetObjectDistance;

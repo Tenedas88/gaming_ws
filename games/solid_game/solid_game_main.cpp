@@ -93,7 +93,7 @@ public:
 		stoppedTriangleObjStart(115,180),
 		stoppedSquareObjStart(140,180),
 		stoppedPolygonObjStart(128,160),
-		stoppedLineObjStart(128,190),
+		stoppedLineObjStart(118,190),
 		stoppedLineObjDirection(1,-1),
 		movingObjStart(128,118),
 		destination(120,240)
