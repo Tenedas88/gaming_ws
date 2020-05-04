@@ -202,6 +202,15 @@ olc::vi2d SolidObjGameEngine::calculateSolidDestination(SolidObject* targetObjec
     CollisionSurface_t* targetSurface = this->collisionMatrix[targetObject->getCollisionSpace()];
     CollisionVector_t   collisionsArray = targetSurface->collisionsArray;
 
+    // //variable to try avoid the object
+    // olc::vi2d xTestDirections[2];
+    // xTestDirections[0] = {1,0};
+    // xTestDirections[1] = {-1,0};
+
+    // olc::vi2d yTestDirections[2];
+    // yTestDirections[0] = {0,1};
+    // yTestDirections[1] = {0,-1};
+
     for(auto registeredObject = collisionsArray.begin(); registeredObject != collisionsArray.end(); registeredObject++)
     {
         if((*registeredObject) != targetObject)
@@ -209,6 +218,25 @@ olc::vi2d SolidObjGameEngine::calculateSolidDestination(SolidObject* targetObjec
             if(pnpolySurfaceBoundsCalculation(targetSurface->collisionSurfaceSize,targetSurface->collisionSurfacePoints,(*registeredObject)->getPosition()))
             {
                 targetCalculatedDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination);
+
+                // if(targetCalculatedDestination.x == 0)
+                // {
+                //     for(int i = 0; i < 2; i++)
+                //     {
+                //         targetCalculatedDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination+yTestDirections[i]);
+                //         if(targetCalculatedDestination.y != 0)
+                //             break;
+                //     }
+                // }
+                // else if(targetCalculatedDestination.y == 0)
+                // {
+                //     for(int i = 0; i < 2; i++)
+                //     {
+                //         targetCalculatedDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination+xTestDirections[i]);
+                //         if(targetCalculatedDestination.x != 0)
+                //             break;
+                //     }
+                // }
 
                 if (abs(targetCalculatedDestination.x) < abs(targetResultDestination.x))
                     targetResultDestination.x = targetCalculatedDestination.x;
