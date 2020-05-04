@@ -202,14 +202,22 @@ olc::vi2d SolidObjGameEngine::calculateSolidDestination(SolidObject* targetObjec
     CollisionSurface_t* targetSurface = this->collisionMatrix[targetObject->getCollisionSpace()];
     CollisionVector_t   collisionsArray = targetSurface->collisionsArray;
 
-    // //variable to try avoid the object
-    // olc::vi2d xTestDirections[2];
-    // xTestDirections[0] = {1,0};
-    // xTestDirections[1] = {-1,0};
 
-    // olc::vi2d yTestDirections[2];
-    // yTestDirections[0] = {0,1};
-    // yTestDirections[1] = {0,-1};
+    //variable to try avoid the object
+
+    unsigned int correctiveFactor = targetObject->getRadius();
+
+    olc::vi2d xTestDirections[4];
+    xTestDirections[0] = {1,-2};
+    xTestDirections[1] = {-1,-2};
+    xTestDirections[2] = {1,2};
+    xTestDirections[3] = {-1,2};
+
+    olc::vi2d yTestDirections[4];
+    yTestDirections[0] = {2,1};
+    yTestDirections[1] = {2,-1};
+    yTestDirections[2] = {-2,1};
+    yTestDirections[3] = {-2,-1};
 
     for(auto registeredObject = collisionsArray.begin(); registeredObject != collisionsArray.end(); registeredObject++)
     {
@@ -219,22 +227,25 @@ olc::vi2d SolidObjGameEngine::calculateSolidDestination(SolidObject* targetObjec
             {
                 targetCalculatedDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination);
 
-                // if(targetCalculatedDestination.x == 0)
+                // if(targetCalculatedDestination.x == 0 && targetCalculatedDestination.y == 0)
                 // {
-                //     for(int i = 0; i < 2; i++)
+                //     if(targetCalculatedDestination.x == 0)
                 //     {
-                //         targetCalculatedDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination+yTestDirections[i]);
-                //         if(targetCalculatedDestination.y != 0)
-                //             break;
+                //         for(int i = 0; i < 4; i++)
+                //         {
+                //             targetCalculatedDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination+yTestDirections[i]);
+                //             if(targetCalculatedDestination.x == 0 && targetCalculatedDestination.y == 0)
+                //                 break;
+                //         }
                 //     }
-                // }
-                // else if(targetCalculatedDestination.y == 0)
-                // {
-                //     for(int i = 0; i < 2; i++)
+                //     else if(targetCalculatedDestination.y == 0)
                 //     {
-                //         targetCalculatedDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination+xTestDirections[i]);
-                //         if(targetCalculatedDestination.x != 0)
-                //             break;
+                //         for(int i = 0; i < 4; i++)
+                //         {
+                //             targetCalculatedDestination = (*registeredObject)->getAllowedDestination(targetObject, targetDestination+xTestDirections[i]);
+                //             if(targetCalculatedDestination.x == 0 && targetCalculatedDestination.y == 0)
+                //                 break;
+                //         }
                 //     }
                 // }
 
